@@ -11,9 +11,20 @@ import {
 import FriendsList from "./components/FriendsList";
 import LoginForm from "./components/LoginForm";
 import PrivateRoute from "./components/PrivateRoute";
+import { axiosWithAuth } from "./utils/axiosWithAuth";
 
 function App() {
-  const logout = () => {};
+  const logout = () => {
+    axiosWithAuth()
+      .post("/logout")
+      .then(() => {
+        localStorage.removeItem("token");
+        window.location.href = "/login";
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   return (
     <Router>

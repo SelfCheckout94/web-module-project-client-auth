@@ -1,52 +1,61 @@
 import React, { useEffect, useState } from "react";
 
 import Friend from "./Friend";
-import axios from "axios";
 import { axiosWithAuth } from "../utils/axiosWithAuth";
 import { v4 as uuidv4 } from "uuid";
 
-const initialFormValues = {
-  id: uuidv4(),
+const initialFormValues = [
+  {
+    id: "",
+    name: "",
+    age: "",
+    email: "",
+  },
+];
+
+const initialFriend = {
+  id: "",
   name: "",
   age: "",
   email: "",
 };
 
 const FriendsList = () => {
-  const [formValues, setFormValues] = useState([initialFormValues]);
+  const [formValues, setFormValues] = useState(initialFormValues);
   const [friends, setFriends] = useState([]);
+  const [newFriend, setNewFriend] = useState(initialFriend);
 
   useEffect(() => {
+    getData();
+  }, []);
+
+  const getData = () => {
     axiosWithAuth()
       .get("/friends")
       .then((res) => {
         setFriends(res.data);
       })
       .catch((err) => console.log(err));
-  }, []);
+  };
 
   const handleChange = (e) => {
     e.preventDefault();
-    setFormValues({
-      friend: {
-        ...formValues,
-        [e.target.name]: e.target.value,
-      },
+    setNewFriend({
+      ...newFriend,
+      [e.target.name]: e.target.value,
     });
-    console.log(formValues);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setNewFriend(formValues);
     axiosWithAuth()
-      .get(`/friends`)
+      .post(`/friends/`, newFriend)
       .then((res) => {
-        console.log(res);
-        setFriends([...friends, formValues]);
+        setFriends([...friends, newFriend]);
       })
       .catch((err) => console.log(err));
     setFormValues(initialFormValues);
-    console.log(friends);
   };
 
   return (
@@ -56,21 +65,21 @@ const FriendsList = () => {
           <input
             name="name"
             type="text"
-            placehold="Name"
+            placeholder="Name"
             value={formValues.name}
             onChange={handleChange}
           />
           <input
             name="age"
             type="text"
-            placehold="Age"
+            placeholder="Age"
             value={formValues.age}
             onChange={handleChange}
           />
           <input
             name="email"
             type="email"
-            placehold="E-Mail"
+            placeholder="E-Mail"
             value={formValues.email}
             onChange={handleChange}
           />
@@ -78,7 +87,7 @@ const FriendsList = () => {
         </form>
       </label>
       {friends.map((obj) => {
-        return <Friend data={obj} />;
+        return <Friend data={obj} key={uuidv4()} />;
       })}
     </div>
   );

@@ -1,7 +1,6 @@
 import React from "react";
 
 const Friend = ({ data }) => {
-  console.log(data);
   return (
     <div>
       <div>
